@@ -18,7 +18,7 @@ jobs:
           cache: yarn
           registry-url: https://registry.npmjs.org/
       - name: Restore CI cache
-      - uses: actions/cache@v3
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-12-${{ hashFiles('**/yarn.lock') }}
@@ -27,7 +27,6 @@ jobs:
       - name: Compiling
         run: yarn build
       - name: Push new code
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           echo -e "\n# Initialize some useful variables"
           REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
