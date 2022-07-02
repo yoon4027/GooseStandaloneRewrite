@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  Building:
+    name: Building
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore CI cache
+      - uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-12-${{ hashFiles('**/yarn.lock') }}
+      - name: Use NodeJs v18.4.0
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: yarn
+          registry-url: https://registry.npmjs.org/
+      - name: Install Dependencies
+        run: yarn --immutable
+      - name: Compiling
+        run: yarn build
+      - name: Push new code
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          echo -e "\n# Initialize some useful variables"
+          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          BRANCH_OR_TAG=`awk -F/ '{print $2}' <<< $GITHUB_REF`
+          CURRENT_BRANCH=`awk -F/ '{print $NF}' <<< $GITHUB_REF`
+          if [ "$BRANCH_OR_TAG" == "heads" ]; then
+            SOURCE_TYPE="branch"
+          else
+            SOURCE_TYPE="tag"
+          fi
+          git add --all .
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_EMAIL}"
+          git commit -m "build: tsc build for ${GITHUB_SHA}" || true
+          git push origin $TARGET_BRANCH
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_ACTOR: yoon4027
+  GITHUB_EMAIL: ${{ secrets.EMAIL }}
