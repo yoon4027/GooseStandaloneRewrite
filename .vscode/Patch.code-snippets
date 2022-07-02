@@ -1,0 +1,17 @@
+{
+  "Patch": {
+    "scope": "typescript",
+    "prefix": "createPatch",
+    "body": [
+      "import { Patch } from '#lib/structures';",
+      "",
+      "export class UserPatch extends Patch {",
+      "\tpublic override async run(args: Patch.Args) {",
+      "\t$0",
+      "\t}",
+      "}",
+      ""
+    ],
+    "description": "Creates a Patch"
+  }
+}
