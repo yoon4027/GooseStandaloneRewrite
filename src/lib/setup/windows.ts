@@ -8,6 +8,7 @@ const logger = new Logger("win-setup");
 
 export const setupWindows = async ({ basePath }: SetupWindowsArgs) => {
   logger.info("Computing paths...");
+
   const oldAppPath = join(basePath, `app-0.0.0`);
 
   const exePath = join(
