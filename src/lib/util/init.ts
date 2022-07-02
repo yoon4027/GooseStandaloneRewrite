@@ -1,3 +1,4 @@
+import { downloadFile } from "#lib/util";
 import type { InitOptions } from "#types/types.js";
 import { Logger } from "@dimensional-fun/logger";
 import { toTitleCase } from "@sapphire/utilities";
@@ -40,7 +41,7 @@ export const init = async ({ channel, platform, buildPath }: InitOptions) => {
 
         logger.info("Downloading tar (", url, ")");
 
-        //await downloadFile(path, url);
+        await downloadFile(tarPath, url);
 
         break;
       }
