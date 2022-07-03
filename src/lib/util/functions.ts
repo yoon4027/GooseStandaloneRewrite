@@ -26,7 +26,7 @@ export const replaceInFile = async ({
 export const downloadFile = async (path: string, url: string) => {
   const res = await axios.get(url, { responseType: "blob" });
 
-  return await writeFile(path, res.data);
+  await writeFile(path, res.data);
 };
 
 export const renameFile = async ({

@@ -57,7 +57,7 @@ export const init = async ({ channel, platform, buildPath }: InitOptions) => {
         );
 
         if (manifestRequest.status !== 200)
-          return logger.error("Failed to fetch the mainfest file.");
+          logger.error("Failed to fetch the mainfest file.");
 
         const manifest = manifestRequest.data;
 

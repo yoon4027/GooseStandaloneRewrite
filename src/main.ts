@@ -1,15 +1,16 @@
 await import("#lib/util/setup");
 
-import { final } from "#lib/util/final";
-import { init } from "#lib/util/init";
+import { final } from "#lib/util/setup/final";
+import { init } from "#lib/util/setup/init";
 import type { InquirerOptions } from "#types/types";
 import { Logger } from "@dimensional-fun/logger";
 import { container } from "@sapphire/pieces";
 import { Result } from "@sapphire/result";
 import { readFile, rm } from "fs/promises";
 import { default as Inquirer } from "inquirer";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { exit } from "process";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const logger = new Logger("main");
@@ -92,7 +93,9 @@ async function bootstrap() {
   };
 
   for (const patchName of options.patches) {
-    await patchesStore.get(patchName)?.run({ ...dirs }, extraInformation);
+    void (await patchesStore
+      .get(patchName)
+      ?.run({ ...dirs }, extraInformation));
   }
 
   logger.info("\n\nFinalising...");
@@ -115,7 +118,7 @@ async function bootstrap() {
   }
   logger.silly("Process fully done.");
 
-  process.exit(0);
+  exit(0);
 }
 
 await bootstrap();
