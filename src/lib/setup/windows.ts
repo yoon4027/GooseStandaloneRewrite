@@ -1,6 +1,7 @@
 import { copyDir } from "#lib/util";
 import { Logger } from "@dimensional-fun/logger";
 import { execSync } from "child_process";
+import { existsSync } from "fs";
 import { readdir, rm } from "fs/promises";
 import { join } from "path";
 
@@ -15,6 +16,9 @@ export const setupWindows = async ({ basePath }: SetupWindowsArgs) => {
     oldAppPath,
     (await readdir(oldAppPath)).find((x) => x.includes(".exe"))!
   );
+
+  if (!existsSync(exePath))
+    return logger.error("Couldn't find the executable file.");
 
   logger.warn("Running Discord to generate installer.db...");
 
@@ -45,7 +49,7 @@ export const setupWindows = async ({ basePath }: SetupWindowsArgs) => {
     to: newAppPath,
   });
 
-  await rm(oldAppPath, { recursive: true, force: true });
+  return await rm(oldAppPath, { recursive: true, force: true });
 };
 
 interface SetupWindowsArgs {

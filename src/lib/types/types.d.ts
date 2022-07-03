@@ -37,6 +37,25 @@ export interface ReplaceInFileOptions {
   replaceWith: string;
 }
 
+export interface DiscordManifest {
+  modules: { [key: string]: DiscordManifestModule };
+  full: DiscordManifestFull;
+  deltas: DiscordManifestFull[];
+  required_modules: string[];
+}
+
+export interface DiscordManifestFull {
+  host_version: number[];
+  package_sha256: string;
+  url: string;
+  module_version?: number;
+}
+
+export interface DiscordManifestModule {
+  full: Full;
+  deltas: Full[];
+}
+
 export type DiscordChannel = "stable" | "ptb" | "canary";
 export type UserPlatform = "windows" | "linux";
 export type DiscordClientType = "smartcord" | "betterdiscord" | "goosemod";

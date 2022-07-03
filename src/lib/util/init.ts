@@ -1,8 +1,9 @@
 import { downloadFile } from "#lib/util";
-import type { InitOptions } from "#types/types.js";
+import type { DiscordManifest, InitOptions } from "#types/types.js";
 import { Logger } from "@dimensional-fun/logger";
 import { toTitleCase } from "@sapphire/utilities";
 import Asar from "asar";
+import axios, { AxiosResponse } from "axios";
 import { existsSync } from "node:fs";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "path";
@@ -51,12 +52,19 @@ export const init = async ({ channel, platform, buildPath }: InitOptions) => {
 
         logger.info("Downloading tar ( 1/2 - manifest -", manifestUrl, ")");
 
-        const manifest = await (await fetch(manifestUrl)).json();
+        const manifestRequest: AxiosResponse<DiscordManifest> = await axios.get(
+          manifestUrl
+        );
+
+        if (manifestRequest.status !== 200)
+          return logger.error("Failed to fetch the mainfest file.");
+
+        const manifest = manifestRequest.data;
 
         logger.info("Downloading tar ( 2/2 - tar -", manifest.full.url, ")");
 
         const data = brotliDecompressSync(
-          await (await fetch(manifest.full.url)).arrayBuffer()
+          await axios.get(manifest.full.url, { responseType: "arraybuffer" })
         );
 
         await writeFile(tarPath, data);
@@ -86,7 +94,7 @@ export const init = async ({ channel, platform, buildPath }: InitOptions) => {
   }
 
   if (!existsSync(asarExtractPath)) {
-    mkdir(asarExtractPath, { recursive: true });
+    void mkdir(asarExtractPath, { recursive: true });
 
     Asar.extractAll(asarFilePath, asarExtractPath);
   }
