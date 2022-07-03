@@ -40,7 +40,8 @@ jobs:
             SOURCE_TYPE="tag"
           fi
           TARGET_BRANCH="build"
-          git add --all .
+          git checkout -b build
+          git add dist package.json yarn.lock
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"
           git commit -m "build: tsc build for ${GITHUB_SHA}" || true
