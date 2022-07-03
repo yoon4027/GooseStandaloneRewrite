@@ -27,7 +27,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --immutable
       - name: Compiling
-        run: yarn build
+        run: yarn dist
       - name: Push new code
         run: |
           echo -e "\n# Initialize some useful variables"
