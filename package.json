@@ -4,7 +4,7 @@
   "private": true,
   "main": "./dist/main.js",
   "scripts": {
-    "dist": "tsup",
+    "dist": "tsup -d build",
     "watch": "tsup --watch",
     "start": "node dist/main.js",
     "dev": "tsup --watch --onSuccess \"node ./dist/main.js\""
