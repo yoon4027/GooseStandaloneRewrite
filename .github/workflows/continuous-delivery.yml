@@ -41,7 +41,7 @@ jobs:
           fi
           TARGET_BRANCH="build"
           git checkout -b build
-          git add dist package.json yarn.lock
+          git add dist package.json yarn.lock -f
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"
           git commit -m "build: tsc build for ${GITHUB_SHA}" || true
