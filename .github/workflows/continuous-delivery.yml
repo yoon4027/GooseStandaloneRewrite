@@ -2,16 +2,16 @@ name: Build
 
 on:
   push:
-    branches: [master]
+    branches: [master, main]
   pull_request:
-    branches: [master]
+    branches: [master, main]
 
 jobs:
   Building:
     name: Building
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout Project"
+      - name: Checkout Project
         uses: actions/checkout@v3
       - name: Use NodeJs v18.4.0
         uses: actions/setup-node@v3
