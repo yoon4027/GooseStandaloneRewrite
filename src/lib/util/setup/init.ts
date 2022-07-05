@@ -4,10 +4,11 @@ import { Logger } from "@dimensional-fun/logger";
 import { toTitleCase } from "@sapphire/utilities";
 import Asar from "asar";
 import axios, { AxiosResponse } from "axios";
+import { createSpinner, Spinner } from "nanospinner";
 import { existsSync } from "node:fs";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "path";
-import Tar from "tar";
+import { x } from "tar";
 import { brotliDecompressSync } from "zlib";
 
 const logger = new Logger("init");
@@ -36,21 +37,28 @@ export const init = async ({ channel, platform, buildPath }: InitOptions) => {
   }
 
   if (!existsSync(tarPath)) {
+    let downloadSpinner: Spinner;
+
     switch (platform) {
       case "linux": {
         const url = `https://discord.com/api/download/${channel}?platform=linux&format=tar.gz`;
 
-        logger.info("Downloading tar (", url, ")");
+        downloadSpinner = createSpinner(
+          `Downloading tar ( 1/1 - tar - ${url})`
+        ).start();
 
         await downloadFile(tarPath, url);
 
+        downloadSpinner.success({ text: "Downloaded Tar" });
         break;
       }
 
       case "windows": {
         const manifestUrl = `https://discord.com/api/updates/distributions/app/manifests/latest?channel=${channel}&platform=win&arch=x86`;
 
-        logger.info("Downloading tar ( 1/2 - manifest -", manifestUrl, ")");
+        downloadSpinner = createSpinner(
+          `Downloading tar ( 1/2 - manifest - ${manifestUrl} )`
+        ).start();
 
         const manifestRequest: AxiosResponse<DiscordManifest> = await axios.get(
           manifestUrl
@@ -59,9 +67,13 @@ export const init = async ({ channel, platform, buildPath }: InitOptions) => {
         if (manifestRequest.status !== 200)
           logger.error("Failed to fetch the mainfest file.");
 
+        downloadSpinner.success({ text: "Downloaded manifest." });
+
         const manifest = manifestRequest.data;
 
-        logger.info("Downloading tar ( 2/2 - tar -", manifest.full.url, ")");
+        downloadSpinner = createSpinner(
+          `Downloading tar ( 2/2 - tar - ${manifest.full.url} )`
+        ).start();
 
         const data = brotliDecompressSync(
           await axios.get(manifest.full.url, { responseType: "arraybuffer" })
@@ -69,21 +81,23 @@ export const init = async ({ channel, platform, buildPath }: InitOptions) => {
 
         await writeFile(tarPath, data);
 
+        downloadSpinner.success({ text: "Downloaded Tar" });
+
         break;
       }
     }
   }
 
-  logger.info("Got tar");
-
   if (!existsSync(basePath)) {
-    await Tar.x({
+    const tarExtractSpinner = createSpinner("Extracting Tar").start();
+
+    await x({
       file: tarPath,
       cwd: exPath,
     });
-  }
 
-  logger.info("Extracted tar");
+    tarExtractSpinner.success({ text: "Extracted Tar" });
+  }
 
   if (platform === "windows") {
     await rm(join(dirPath, `delta_manifest.json`));
@@ -96,10 +110,12 @@ export const init = async ({ channel, platform, buildPath }: InitOptions) => {
   if (!existsSync(asarExtractPath)) {
     void mkdir(asarExtractPath, { recursive: true });
 
-    Asar.extractAll(asarFilePath, asarExtractPath);
-  }
+    const asarExractSpinner = createSpinner("Extracting Asar").start();
 
-  logger.info("Extracted asar");
+    Asar.extractAll(asarFilePath, asarExtractPath);
+
+    asarExractSpinner.success({ text: "Extracted Asar." });
+  }
 
   logger.info("Initialised");
 

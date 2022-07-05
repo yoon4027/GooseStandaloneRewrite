@@ -30,8 +30,6 @@ jobs:
         run: yarn dist
       - name: Push new code
         run: |
-          echo -e "\n# Initialize some useful variables"
-          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           BRANCH_OR_TAG=`awk -F/ '{print $2}' <<< $GITHUB_REF`
           CURRENT_BRANCH=`awk -F/ '{print $NF}' <<< $GITHUB_REF`
           if [ "$BRANCH_OR_TAG" == "heads" ]; then
@@ -40,7 +38,7 @@ jobs:
             SOURCE_TYPE="tag"
           fi
           TARGET_BRANCH="build"
-          git checkout -b build
+          git checkout -b $TARGET_BRANCH
           git add dist package.json yarn.lock -f
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"

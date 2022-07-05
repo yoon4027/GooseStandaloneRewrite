@@ -5,6 +5,7 @@ import { Logger } from "@dimensional-fun/logger";
 import { createPackage } from "asar";
 import { existsSync } from "fs";
 import { mkdir, rm, writeFile } from "fs/promises";
+import { createSpinner } from "nanospinner";
 import { join } from "path";
 
 const logger = new Logger("final");
@@ -13,9 +14,11 @@ export const final = async (
   { basePath, asarFilePath, asarExtractPath }: PatchRun,
   { platform, finalPath }: FinalExtraInformation
 ) => {
+  const createPackageSpinner = createSpinner("Repacking Asar").start();
+
   await createPackage(asarExtractPath, asarFilePath);
 
-  logger.info("Repacked asar");
+  createPackageSpinner.success({ text: "Repacked Asar" });
 
   if (existsSync(finalPath)) {
     await rm(finalPath, { recursive: true, force: true });
